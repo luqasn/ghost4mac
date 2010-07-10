@@ -102,44 +102,14 @@
 
 - (IBAction)loadMapButtonClicked:(id)sender
 {
-	NSLog(@"Map: %@", [sender description]);
-	/*BOOL pullsDown = NO;
-	NSMenu *menu = [[NSMenu alloc] init];
-    [menu insertItemWithTitle:@"add"
-                       action:@selector(add:)
-                keyEquivalent:@""
-                      atIndex:0];
-	
-	NSRect frame = [[sender view] frame];
-    frame.origin.x = 0.0;
-    frame.origin.y = 0.0;
-	
-    if (pullsDown) [menu insertItemWithTitle:@"" action:NULL keyEquivalent:@"" atIndex:0];
-	
-    NSPopUpButtonCell *popUpButtonCell = [[NSPopUpButtonCell alloc] initTextCell:@"" pullsDown:pullsDown];
-    [popUpButtonCell setMenu:menu];
-    if (!pullsDown) [popUpButtonCell selectItem:nil];
-    [popUpButtonCell performClickWithFrame:frame inView:[sender view]];*/
-	
-    
-	
-    //[NSMenu popUpContextMenu:menu withEvent:event forView:sender];
-	
-	/*NSFetchRequest *frq = [[NSFetchRequest alloc] init];
-	[frq setEntity:[NSEntityDescription entityForName:@"GMapFile" inManagedObjectContext:self.managedObjectContext]];
-	NSArray *existing = [self.managedObjectContext executeFetchRequest:frq error:nil];
-	[frq release];
-	
-	NSEnumerator *mapFileEnum = [existing objectEnumerator];
-	GMapFile *curMapFile;
-	while (curMapFile = [mapFileEnum nextObject]) {
-		if (![mapFileNames containsObject:[curMapFile path]])
-		{
-			[self.managedObjectContext deleteObject:curMapFile];
+	GMap *map = [[sender selectedItem] representedObject];
+	NSEnumerator *e = [[botsController selectedObjects] objectEnumerator];
+	Bot *b;
+	while (b = [e nextObject]) {
+		if ([[[b entity] name] isEqualToString:@"BotLocal"]) {
+			((BotLocal*)b).currentMap = map;
 		}
-		else
-			[mapFileNames removeObject:[curMapFile path]];
-	}*/
+	}
 }
 
 
@@ -150,13 +120,13 @@
 {
 	Bot *bot = [[botsController selectedObjects] lastObject];
 	if (bot)
-		[bot start];
+		bot.running = [NSNumber numberWithBool:YES];
 }
 - (IBAction)stopBot:(id)sender
 {
 	Bot *bot = [[botsController selectedObjects] lastObject];
 	if (bot)
-		[bot stop];
+		bot.running = [NSNumber numberWithBool:NO];
 }
 
 
@@ -246,10 +216,17 @@
 															nil]];
 }
 
-- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item {
+    if ([outlineView parentForItem:item]) {
+        // If not nil; then the item has a parent.
+        return NO;
+    }
+    return YES;
+}
+
+- (void)selectedBotChanged:(Bot*)bot
 {
-	NSManagedObject *obj = [[botsController selectedObjects] lastObject];
-	if (obj == nil) {
+	if (bot == nil) {
 		localBotView.selectedBot = nil;
 		self.botViewController = nil;
 	}
@@ -263,19 +240,19 @@
 	}
 	[views release];
 	
-	if ([[[obj entity] name] isEqualToString:@"BotLocal"]) {
-		localBotView.selectedBot = (BotLocal*)obj;
+	if ([[[bot entity] name] isEqualToString:@"BotLocal"]) {
+		localBotView.selectedBot = (BotLocal*)bot;
 		NSRect contentFrame = [contentView frame];
 		contentFrame.origin.x = 0;
 		contentFrame.origin.y = 0;
-
+		
 		[contentView addSubview:[localBotView view]];
 		[[localBotView view] setFrame:contentFrame];
 		self.botViewController = localBotView;
 		[modeChanger setEnabled:YES forSegment:1];
 		
-	} else if ([[[obj entity] name] isEqualToString:@"BotAdminGame"]) {
-		adminGameView.selectedBot = (BotAdminGame*)obj;
+	} else if ([[[bot entity] name] isEqualToString:@"BotAdminGame"]) {
+		adminGameView.selectedBot = (BotAdminGame*)bot;
 		NSRect contentFrame = [contentView frame];
 		contentFrame.origin.x = 0;
 		contentFrame.origin.y = 0;
@@ -285,6 +262,30 @@
 		self.botViewController = adminGameView;
 		[modeChanger setEnabled:NO forSegment:1];
 	}
+}
+
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification
+{
+	Bot *obj = [[botsController selectedObjects] lastObject];
+	[self selectedBotChanged:obj];
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+{
+	Bot *obj = [[botsController selectedObjects] lastObject];
+	[self selectedBotChanged:obj];
+}
+
+- (void)tableView:(NSTableView *)tableView
+  willDisplayCell:(id)cell
+   forTableColumn:(NSTableColumn *)tableColumn
+			  row:(NSInteger)row
+{
+    if (![[tableColumn identifier] isEqualToString: @"MainBotListConfigColumn"])
+		return;
+	Bot *bot = [[botsController arrangedObjects] objectAtIndex:row];
+	[cell bind:@"bot" toObject:bot withKeyPath:@"self" options:nil];
+	//LRBotCell 
 }
 
 - (IBAction)openConfigWindow:sender {
@@ -309,6 +310,24 @@
 			modalDelegate: nil
 		   didEndSelector: nil
 			  contextInfo: nil];
+	}
+}
+
+- (IBAction)addButtonPressed:(id)sender
+{
+	
+}
+- (IBAction)removeButtonPressed:(id)sender
+{
+	NSAlert *alert = [NSAlert alertWithMessageText:@"Are you sure?"
+									 defaultButton:@"Cancel"
+								   alternateButton:@"Delete"
+									   otherButton:nil
+						 informativeTextWithFormat:@"You are about to delete the bot '%@' and all associated settings!", [[[botsController selectedObjects] lastObject] name]];
+	[alert setAlertStyle:NSCriticalAlertStyle];
+
+	if ([alert runModal] == NSAlertAlternateReturn) {
+		[botsController removeObjects:[botsController selectedObjects]];
 	}
 }
 
@@ -393,6 +412,8 @@
 							 //[NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
     NSURL *url = [NSURL fileURLWithPath: [applicationSupportDirectory stringByAppendingPathComponent: @"GenieDatabase"]];
     persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: mom];
+	
+	
     if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType 
                                                 configuration:nil 
                                                 URL:url 
@@ -400,10 +421,30 @@
                                                 error:&error]){
 		NSLog(@"Migration error: %@", [error description]);
 		NSLog(@"Migration userInfo: %@", [[error userInfo] description]);
-        [[NSApplication sharedApplication] presentError:error];
-        [persistentStoreCoordinator release], persistentStoreCoordinator = nil;
-        return nil;
-    }    
+		if ([error code] == 134140) {
+			NSAlert *alert = [NSAlert alertWithMessageText:@"Could not read application database"
+											 defaultButton:@"Quit"
+										   alternateButton:@"Continue without database"
+											   otherButton:nil
+								 informativeTextWithFormat:@"Genie can't read your local database at \n~/Library/Application Support/Genie/GenieDatabase\nprobably because it was created by a newer version of the application. Either delete the database if you want to run this specific version of the application or try a never version. If you choose to continue without a database, Genie can't save your setup upon exit."];
+			NSInteger result = [alert runModal];
+			switch (result) {
+				case NSAlertDefaultReturn:
+					// quit
+					[persistentStoreCoordinator release], persistentStoreCoordinator = nil;
+					return nil;
+					break;
+				case NSAlertAlternateReturn:
+					// just use the memory store
+					break;
+			}
+		} else {
+			[[NSApplication sharedApplication] presentError:error];
+		}
+        //[persistentStoreCoordinator release], persistentStoreCoordinator = nil;
+        //return nil;
+    }
+	[persistentStoreCoordinator addPersistentStoreWithType:NSInMemoryStoreType configuration:nil URL:nil options:nil error:nil];
 
     return persistentStoreCoordinator;
 }
@@ -419,11 +460,11 @@
 
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
     if (!coordinator) {
-        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-        [dict setValue:@"Failed to initialize the store" forKey:NSLocalizedDescriptionKey];
-        [dict setValue:@"There was an error building up the data file." forKey:NSLocalizedFailureReasonErrorKey];
-        NSError *error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN" code:9999 userInfo:dict];
-        [[NSApplication sharedApplication] presentError:error];
+        //NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        //[dict setValue:@"Failed to initialize the store" forKey:NSLocalizedDescriptionKey];
+        //[dict setValue:@"There was an error building up the data file." forKey:NSLocalizedFailureReasonErrorKey];
+        //NSError *error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN" code:9999 userInfo:dict];
+        //[[NSApplication sharedApplication] presentError:error];
 		[[NSApplication sharedApplication] terminate:nil];
         return nil;
     }
@@ -517,6 +558,7 @@
         NSString *cancelButton = NSLocalizedString(@"Cancel", @"Cancel button title");
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:question];
+		//NSString *info2 = [NSString error.userInfo];
         [alert setInformativeText:info];
         [alert addButtonWithTitle:quitButton];
         [alert addButtonWithTitle:cancelButton];

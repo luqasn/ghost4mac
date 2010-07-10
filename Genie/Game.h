@@ -8,11 +8,21 @@
 
 #import <CoreData/CoreData.h>
 
+typedef enum GameStatus {
+	GameStatusLobby,
+	GameStatusClosed,
+	GameStatusRunning
+} GameStatus;
+
 @class Bot;
 
 @interface Game :  NSManagedObject  
 {
+	NSValue *gameObject;
+	NSCalendarDate *dateCreated;
 }
+
+@property (nonatomic, retain) NSValue * gameObject;
 
 @property (nonatomic, retain) NSNumber * status;
 @property (nonatomic, retain) NSNumber * id;
@@ -21,6 +31,7 @@
 @property (nonatomic, retain) NSSet* messages;
 @property (nonatomic, retain) Bot * bot;
 @property (nonatomic, retain) NSSet* players;
+@property (nonatomic, retain) NSCalendarDate* dateCreated;
 
 @end
 

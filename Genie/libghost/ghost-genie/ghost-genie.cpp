@@ -7,12 +7,24 @@
  *
  */
 
+#include <string>
+
 #include "ghost-genie.h"
 #include "bnet-genie.h"
 
 #include "csvparser.h"
 #include "util.h"
 #include "ghostdb.h"
+#include "game_base.h"
+#include "game_admin.h"
+#include "game-genie.h"
+#include "config.h"
+#include "language.h"
+#include "packed.h"
+#include "savegame.h"
+#include "map.h"
+#include "gameprotocol.h"
+#include "sqlite3.h"
 
 CGHostGenie :: CGHostGenie( MessageLogger *logger, CConfig *CFG ) : CGHost( logger, CFG ),
 hashCallback( NULL ),
@@ -20,11 +32,12 @@ bnetCallback( NULL ),
 gameCallback( NULL ),
 ip2countryCallback( NULL)
 {
+	bool enableRemoteHash = CFG->GetInt( "genie_remotehash", 1 ) == 0 ? false : true;
 	vector<CBNET*> newBNETs;
 	for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
 	{
 		CBNET *o = *i;
-		CBNETGenie *bnet = new CBNETGenie( this, o, true );
+		CBNETGenie *bnet = new CBNETGenie( this, o, enableRemoteHash );
 		newBNETs.push_back( bnet );
 	}
 	// swap bnet lists
@@ -239,7 +252,17 @@ void CGHostGenie :: OnGameEvent( GameEventType type, CBaseGame *game)
 		gameCallback( callbackObject, data );
 }
 
-void CGHostGenie :: CreateGame( CMap *map, unsigned char gameState, bool saveGame, string gameName, string ownerName, string creatorName, string creatorServer, bool whisper )
+void CGHostGenie :: EventGameRefreshed( CBaseGame* game, const string &gamename, unsigned char state )
+{
+	OnGameEvent( GameEventTypeRefreshed, game );
+}
+
+void CGHostGenie :: EventGameLoaded( CBaseGame* game )
+{
+	OnGameEvent( GameEventTypeLoaded, game );
+}
+
+/*void CGHostGenie :: CreateGame( CMap *map, unsigned char gameState, bool saveGame, string gameName, string ownerName, string creatorName, string creatorServer, bool whisper )
 {
 	CBaseGame *oldGame = m_CurrentGame;
 	CGHost :: CreateGame( map, gameState, saveGame, gameName, ownerName, creatorName, creatorServer, whisper );
@@ -248,6 +271,207 @@ void CGHostGenie :: CreateGame( CMap *map, unsigned char gameState, bool saveGam
 		// new game was hosted
 		OnGameEvent( GameEventTypeCreated, m_CurrentGame );
 	}
+}*/
+
+void CGHostGenie :: CreateGame( CMap *map, unsigned char gameState, bool saveGame, string gameName, string ownerName, string creatorName, string creatorServer, bool whisper )
+{
+	if( !m_Enabled )
+	{
+		for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
+		{
+			if( (*i)->GetServer( ) == creatorServer )
+				(*i)->QueueChatCommand( m_Language->UnableToCreateGameDisabled( gameName ), creatorName, whisper );
+		}
+		
+		if( m_AdminGame )
+			m_AdminGame->SendAllChat( m_Language->UnableToCreateGameDisabled( gameName ) );
+		
+		return;
+	}
+	
+	if( gameName.size( ) > 31 )
+	{
+		for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
+		{
+			if( (*i)->GetServer( ) == creatorServer )
+				(*i)->QueueChatCommand( m_Language->UnableToCreateGameNameTooLong( gameName ), creatorName, whisper );
+		}
+		
+		if( m_AdminGame )
+			m_AdminGame->SendAllChat( m_Language->UnableToCreateGameNameTooLong( gameName ) );
+		
+		return;
+	}
+	
+	if( !map->GetValid( ) )
+	{
+		for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
+		{
+			if( (*i)->GetServer( ) == creatorServer )
+				(*i)->QueueChatCommand( m_Language->UnableToCreateGameInvalidMap( gameName ), creatorName, whisper );
+		}
+		
+		if( m_AdminGame )
+			m_AdminGame->SendAllChat( m_Language->UnableToCreateGameInvalidMap( gameName ) );
+		
+		return;
+	}
+	
+	if( saveGame )
+	{
+		if( !m_SaveGame->GetValid( ) )
+		{
+			for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
+			{
+				if( (*i)->GetServer( ) == creatorServer )
+					(*i)->QueueChatCommand( m_Language->UnableToCreateGameInvalidSaveGame( gameName ), creatorName, whisper );
+			}
+			
+			if( m_AdminGame )
+				m_AdminGame->SendAllChat( m_Language->UnableToCreateGameInvalidSaveGame( gameName ) );
+			
+			return;
+		}
+		
+		string MapPath1 = m_SaveGame->GetMapPath( );
+		string MapPath2 = map->GetMapPath( );
+		transform( MapPath1.begin( ), MapPath1.end( ), MapPath1.begin( ), (int(*)(int))tolower );
+		transform( MapPath2.begin( ), MapPath2.end( ), MapPath2.begin( ), (int(*)(int))tolower );
+		
+		if( MapPath1 != MapPath2 )
+		{
+			CONSOLE_Print( "[GHOST] path mismatch, saved game path is [" + MapPath1 + "] but map path is [" + MapPath2 + "]" );
+			
+			for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
+			{
+				if( (*i)->GetServer( ) == creatorServer )
+					(*i)->QueueChatCommand( m_Language->UnableToCreateGameSaveGameMapMismatch( gameName ), creatorName, whisper );
+			}
+			
+			if( m_AdminGame )
+				m_AdminGame->SendAllChat( m_Language->UnableToCreateGameSaveGameMapMismatch( gameName ) );
+			
+			return;
+		}
+		
+		if( m_EnforcePlayers.empty( ) )
+		{
+			for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
+			{
+				if( (*i)->GetServer( ) == creatorServer )
+					(*i)->QueueChatCommand( m_Language->UnableToCreateGameMustEnforceFirst( gameName ), creatorName, whisper );
+			}
+			
+			if( m_AdminGame )
+				m_AdminGame->SendAllChat( m_Language->UnableToCreateGameMustEnforceFirst( gameName ) );
+			
+			return;
+		}
+	}
+	
+	if( m_CurrentGame )
+	{
+		for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
+		{
+			if( (*i)->GetServer( ) == creatorServer )
+				(*i)->QueueChatCommand( m_Language->UnableToCreateGameAnotherGameInLobby( gameName, m_CurrentGame->GetDescription( ) ), creatorName, whisper );
+		}
+		
+		if( m_AdminGame )
+			m_AdminGame->SendAllChat( m_Language->UnableToCreateGameAnotherGameInLobby( gameName, m_CurrentGame->GetDescription( ) ) );
+		
+		return;
+	}
+	
+	if( m_Games.size( ) >= m_MaxGames )
+	{
+		for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
+		{
+			if( (*i)->GetServer( ) == creatorServer )
+				(*i)->QueueChatCommand( m_Language->UnableToCreateGameMaxGamesReached( gameName, UTIL_ToString( m_MaxGames ) ), creatorName, whisper );
+		}
+		
+		if( m_AdminGame )
+			m_AdminGame->SendAllChat( m_Language->UnableToCreateGameMaxGamesReached( gameName, UTIL_ToString( m_MaxGames ) ) );
+		
+		return;
+	}
+	
+	CONSOLE_Print( "[GHOST] creating game [" + gameName + "]" );
+	
+	if( saveGame )
+		m_CurrentGame = new CGameGenie( this, map, m_SaveGame, m_HostPort, gameState, gameName, ownerName, creatorName, creatorServer );
+	else
+		m_CurrentGame = new CGameGenie( this, map, NULL, m_HostPort, gameState, gameName, ownerName, creatorName, creatorServer );
+	
+	// todotodo: check if listening failed and report the error to the user
+	
+	if( m_SaveGame )
+	{
+		m_CurrentGame->SetEnforcePlayers( m_EnforcePlayers );
+		m_EnforcePlayers.clear( );
+	}
+	
+	for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
+	{
+		if( whisper && (*i)->GetServer( ) == creatorServer )
+		{
+			// note that we send this whisper only on the creator server
+			
+			if( gameState == GAME_PRIVATE )
+				(*i)->QueueChatCommand( m_Language->CreatingPrivateGame( gameName, ownerName ), creatorName, whisper );
+			else if( gameState == GAME_PUBLIC )
+				(*i)->QueueChatCommand( m_Language->CreatingPublicGame( gameName, ownerName ), creatorName, whisper );
+		}
+		else
+		{
+			// note that we send this chat message on all other bnet servers
+			
+			if( gameState == GAME_PRIVATE )
+				(*i)->QueueChatCommand( m_Language->CreatingPrivateGame( gameName, ownerName ) );
+			else if( gameState == GAME_PUBLIC )
+				(*i)->QueueChatCommand( m_Language->CreatingPublicGame( gameName, ownerName ) );
+		}
+		
+		if( saveGame )
+			(*i)->QueueGameCreate( gameState, gameName, string( ), map, m_SaveGame, m_CurrentGame->GetHostCounter( ) );
+		else
+			(*i)->QueueGameCreate( gameState, gameName, string( ), map, NULL, m_CurrentGame->GetHostCounter( ) );
+	}
+	
+	if( m_AdminGame )
+	{
+		if( gameState == GAME_PRIVATE )
+			m_AdminGame->SendAllChat( m_Language->CreatingPrivateGame( gameName, ownerName ) );
+		else if( gameState == GAME_PUBLIC )
+			m_AdminGame->SendAllChat( m_Language->CreatingPublicGame( gameName, ownerName ) );
+	}
+	
+	// if we're creating a private game we don't need to send any game refresh messages so we can rejoin the chat immediately
+	// unfortunately this doesn't work on PVPGN servers because they consider an enterchat message to be a gameuncreate message when in a game
+	// so don't rejoin the chat if we're using PVPGN
+	
+	if( gameState == GAME_PRIVATE )
+	{
+		for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
+		{
+			if( (*i)->GetPasswordHashType( ) != "pvpgn" )
+				(*i)->QueueEnterChat( );
+		}
+	}
+	
+	// hold friends and/or clan members
+	
+	for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
+	{
+		if( (*i)->GetHoldFriends( ) )
+			(*i)->HoldFriends( m_CurrentGame );
+		
+		if( (*i)->GetHoldClan( ) )
+			(*i)->HoldClan( m_CurrentGame );
+	}
+	
+	OnGameEvent( GameEventTypeCreated, m_CurrentGame );
 }
 
 void CGHostGenie :: EventGameDeleted( CBaseGame *game )

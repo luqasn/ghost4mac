@@ -115,7 +115,9 @@
 
 - (void)awakeFromFetch
 {
-	self.running = [NSNumber numberWithBool:NO];
+	[self willChangeValueForKey:@"running"];
+	running = [NSNumber numberWithBool:NO];
+	[self didChangeValueForKey:@"running"];
 	aSocket = nil;
 	recvData = nil;
 	cmdTrigger = @"!";
@@ -141,7 +143,11 @@
 		[self messageReceived:[NSString stringWithFormat:@"Error: %@", err]];
 	}
 	else
-		self.running = [NSNumber numberWithBool:YES];
+	{
+		[self willChangeValueForKey:@"running"];
+		running = [NSNumber numberWithBool:YES];
+		[self didChangeValueForKey:@"running"];
+	}
 }
 static NSString *triggerInfo = @"Command trigger: ";
 - (void)onSocket:(AsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
@@ -271,7 +277,9 @@ static NSString *triggerInfo = @"Command trigger: ";
 - (void)onSocketDidDisconnect:(AsyncSocket *)sock
 {
 	NSLog(@"onSocketDidDisconnect:%p", sock);
-	self.running = [NSNumber numberWithBool:NO];
+	[self willChangeValueForKey:@"running"];
+	running = [NSNumber numberWithBool:NO];
+	[self didChangeValueForKey:@"running"];
 	self.loggedIn = [NSNumber numberWithBool:NO];
 }
 

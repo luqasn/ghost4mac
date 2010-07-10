@@ -173,6 +173,8 @@
 		A032D9811107C55400F51A28 /* UKKQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A032D97B1107C55400F51A28 /* UKKQueue.m */; };
 		A032D9821107C55400F51A28 /* UKMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = A032D97D1107C55400F51A28 /* UKMainThreadProxy.m */; };
 		A032D9861107C9DD00F51A28 /* GMapFile.m in Sources */ = {isa = PBXBuildFile; fileRef = A032D9851107C9DD00F51A28 /* GMapFile.m */; };
+		A035CE7C11E8731E00B6FBA3 /* Genie_1.0.6-1.2.0.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = A035CE7B11E8731E00B6FBA3 /* Genie_1.0.6-1.2.0.xcmappingmodel */; };
+		A035CEA111E8783F00B6FBA3 /* Genie_1.1-1.2.0.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = A035CEA011E8783F00B6FBA3 /* Genie_1.1-1.2.0.xcmappingmodel */; };
 		A038008210FC0020004C5080 /* Server.m in Sources */ = {isa = PBXBuildFile; fileRef = A038008110FC0020004C5080 /* Server.m */; };
 		A038015910FC1432004C5080 /* Appcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = A038015810FC1432004C5080 /* Appcast.xml */; };
 		A038028410FD0C3F004C5080 /* GenieHelp in Resources */ = {isa = PBXBuildFile; fileRef = A038027210FD0C3F004C5080 /* GenieHelp */; };
@@ -202,6 +204,10 @@
 		A0665ED31107DDE700527FF2 /* GMap.m in Sources */ = {isa = PBXBuildFile; fileRef = A0665ED21107DDE700527FF2 /* GMap.m */; };
 		A06A8B881108B8BD00624B19 /* PreferenceGeneralController.m in Sources */ = {isa = PBXBuildFile; fileRef = A06A8B871108B8BD00624B19 /* PreferenceGeneralController.m */; };
 		A06A8B8A1108B94F00624B19 /* PreferenceGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = A06A8B891108B94F00624B19 /* PreferenceGeneral.xib */; };
+		A0743F67118A01D400FA35B5 /* LRBotCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A0743F66118A01D400FA35B5 /* LRBotCell.m */; };
+		A07A07B41169123300C42908 /* game-genie.h in Headers */ = {isa = PBXBuildFile; fileRef = A07A07B21169123300C42908 /* game-genie.h */; };
+		A07A07B51169123300C42908 /* game-genie.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A07A07B31169123300C42908 /* game-genie.cpp */; };
+		A0828FAF11E8DF8400EECD2F /* NSManagedObject+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = A0828FAE11E8DF8400EECD2F /* NSManagedObject+Helpers.m */; };
 		A08C81AE111B2CEE00ABDD92 /* Genie_DataModel1.0.3.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = A08C81AD111B2CEE00ABDD92 /* Genie_DataModel1.0.3.xcmappingmodel */; };
 		A08DBC82110CC6B800B3BB3B /* ConfigIntValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A08DBC81110CC6B800B3BB3B /* ConfigIntValueTransformer.m */; };
 		A09A170410EE771500DB0494 /* BotRemote.m in Sources */ = {isa = PBXBuildFile; fileRef = A09A170310EE771500DB0494 /* BotRemote.m */; };
@@ -255,6 +261,9 @@
 		A0EE268010F8A9100029B8BE /* FileImportWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A0EE267F10F8A9100029B8BE /* FileImportWindowController.m */; };
 		A0EE268410F8AB920029B8BE /* hashServers.plist in Resources */ = {isa = PBXBuildFile; fileRef = A0EE268310F8AB920029B8BE /* hashServers.plist */; };
 		A0EE269C10F8AEAC0029B8BE /* FileImportWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A0EE269B10F8AEAC0029B8BE /* FileImportWindow.xib */; };
+		A0F045E011C3096A00623C93 /* bubble.icns in Resources */ = {isa = PBXBuildFile; fileRef = A0F045DD11C3096A00623C93 /* bubble.icns */; };
+		A0F045E111C3096B00623C93 /* cup.icns in Resources */ = {isa = PBXBuildFile; fileRef = A0F045DE11C3096A00623C93 /* cup.icns */; };
+		A0F045E211C3096B00623C93 /* document.icns in Resources */ = {isa = PBXBuildFile; fileRef = A0F045DF11C3096A00623C93 /* document.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -514,6 +523,8 @@
 		A032D97D1107C55400F51A28 /* UKMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UKMainThreadProxy.m; sourceTree = "<group>"; };
 		A032D9841107C9DD00F51A28 /* GMapFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GMapFile.h; path = Classes/GMapFile.h; sourceTree = "<group>"; };
 		A032D9851107C9DD00F51A28 /* GMapFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GMapFile.m; path = Classes/GMapFile.m; sourceTree = "<group>"; };
+		A035CE7B11E8731E00B6FBA3 /* Genie_1.0.6-1.2.0.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = "Genie_1.0.6-1.2.0.xcmappingmodel"; sourceTree = "<group>"; };
+		A035CEA011E8783F00B6FBA3 /* Genie_1.1-1.2.0.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = "Genie_1.1-1.2.0.xcmappingmodel"; sourceTree = "<group>"; };
 		A038008010FC0020004C5080 /* Server.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Server.h; sourceTree = "<group>"; };
 		A038008110FC0020004C5080 /* Server.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Server.m; sourceTree = "<group>"; };
 		A038015810FC1432004C5080 /* Appcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Appcast.xml; sourceTree = "<group>"; };
@@ -557,6 +568,13 @@
 		A06A8B861108B8BD00624B19 /* PreferenceGeneralController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferenceGeneralController.h; sourceTree = "<group>"; };
 		A06A8B871108B8BD00624B19 /* PreferenceGeneralController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferenceGeneralController.m; sourceTree = "<group>"; };
 		A06A8B891108B94F00624B19 /* PreferenceGeneral.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreferenceGeneral.xib; sourceTree = "<group>"; };
+		A0743F65118A01D400FA35B5 /* LRBotCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LRBotCell.h; sourceTree = "<group>"; };
+		A0743F66118A01D400FA35B5 /* LRBotCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LRBotCell.m; sourceTree = "<group>"; };
+		A07A06E71168E39800C42908 /* Genie_DataModel1.1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Genie_DataModel1.1.xcdatamodel; sourceTree = "<group>"; };
+		A07A07B21169123300C42908 /* game-genie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "game-genie.h"; sourceTree = "<group>"; };
+		A07A07B31169123300C42908 /* game-genie.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "game-genie.cpp"; sourceTree = "<group>"; };
+		A0828FAD11E8DF8400EECD2F /* NSManagedObject+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObject+Helpers.h"; sourceTree = "<group>"; };
+		A0828FAE11E8DF8400EECD2F /* NSManagedObject+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObject+Helpers.m"; sourceTree = "<group>"; };
 		A08C8070111B1D2000ABDD92 /* Genie_DataModel1.0.3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Genie_DataModel1.0.3.xcdatamodel; sourceTree = "<group>"; };
 		A08C81AD111B2CEE00ABDD92 /* Genie_DataModel1.0.3.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = Genie_DataModel1.0.3.xcmappingmodel; sourceTree = "<group>"; };
 		A08DBC80110CC6B800B3BB3B /* ConfigIntValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConfigIntValueTransformer.h; sourceTree = "<group>"; };
@@ -638,6 +656,9 @@
 		A0EE267F10F8A9100029B8BE /* FileImportWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileImportWindowController.m; sourceTree = "<group>"; };
 		A0EE268310F8AB920029B8BE /* hashServers.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = hashServers.plist; sourceTree = "<group>"; };
 		A0EE269B10F8AEAC0029B8BE /* FileImportWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FileImportWindow.xib; sourceTree = "<group>"; };
+		A0F045DD11C3096A00623C93 /* bubble.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = bubble.icns; path = Images/Basic_set2_Mac/bubble.icns; sourceTree = "<group>"; };
+		A0F045DE11C3096A00623C93 /* cup.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = cup.icns; path = Images/Basic_set2_Mac/cup.icns; sourceTree = "<group>"; };
+		A0F045DF11C3096A00623C93 /* document.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = document.icns; path = Images/Basic_set2_Mac/document.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -758,6 +779,7 @@
 		29B97314FDCFA39411CA2CEA /* Genie */ = {
 			isa = PBXGroup;
 			children = (
+				A0743F62118A019A00FA35B5 /* UI */,
 				A038015810FC1432004C5080 /* Appcast.xml */,
 				A0C963931120A86A00F7D965 /* AsyncSocket */,
 				A06A8C281108C60200624B19 /* Other Sources */,
@@ -779,6 +801,9 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A0F045DD11C3096A00623C93 /* bubble.icns */,
+				A0F045DE11C3096A00623C93 /* cup.icns */,
+				A0F045DF11C3096A00623C93 /* document.icns */,
 				A04B5ED2110BC22E009F9E74 /* TCMPortMapper */,
 				A038027210FD0C3F004C5080 /* GenieHelp */,
 				A0EE269B10F8AEAC0029B8BE /* FileImportWindow.xib */,
@@ -920,6 +945,8 @@
 				A02EFB3A115EDD4300E580BE /* bncsutilinterface-genie.cpp */,
 				A02EFBAA115F7F5C00E580BE /* ghost-genie.h */,
 				A02EFBAB115F7F5C00E580BE /* ghost-genie.cpp */,
+				A07A07B21169123300C42908 /* game-genie.h */,
+				A07A07B31169123300C42908 /* game-genie.cpp */,
 			);
 			name = "ghost-genie";
 			path = "libghost/ghost-genie";
@@ -1116,8 +1143,19 @@
 				A0C962751120871700F7D965 /* NSData+BinaryHelpers.m */,
 				A0C962FF1120929000F7D965 /* NSMutableData+BinaryHelpers.h */,
 				A0C963001120929000F7D965 /* NSMutableData+BinaryHelpers.m */,
+				A0828FAD11E8DF8400EECD2F /* NSManagedObject+Helpers.h */,
+				A0828FAE11E8DF8400EECD2F /* NSManagedObject+Helpers.m */,
 			);
 			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		A0743F62118A019A00FA35B5 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				A0743F65118A01D400FA35B5 /* LRBotCell.h */,
+				A0743F66118A01D400FA35B5 /* LRBotCell.m */,
+			);
+			name = UI;
 			sourceTree = "<group>";
 		};
 		A09A18A510F02CFA00DB0494 /* Images */ = {
@@ -1302,6 +1340,7 @@
 				A02EFB1F115EDB7E00E580BE /* bnet-genie.h in Headers */,
 				A02EFB3B115EDD4300E580BE /* bncsutilinterface-genie.h in Headers */,
 				A02EFBAC115F7F5C00E580BE /* ghost-genie.h in Headers */,
+				A07A07B41169123300C42908 /* game-genie.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1522,6 +1561,9 @@
 				A03F1B6F1167F4A2001DE85A /* stop_alt16.png in Resources */,
 				A03F1B711167F526001DE85A /* play16.png in Resources */,
 				A03F1B731167F56E001DE85A /* play20.png in Resources */,
+				A0F045E011C3096A00623C93 /* bubble.icns in Resources */,
+				A0F045E111C3096B00623C93 /* cup.icns in Resources */,
+				A0F045E211C3096B00623C93 /* document.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1600,6 +1642,10 @@
 				A03F1BA21167F808001DE85A /* Genie_1.0.6-1.1.xcmappingmodel in Sources */,
 				A03F1BBB1167F910001DE85A /* Genie_1.0.5-1.0.6.xcmappingmodel in Sources */,
 				A03F1BD51167FAAF001DE85A /* Genie_1.0.5-1.1.xcmappingmodel in Sources */,
+				A0743F67118A01D400FA35B5 /* LRBotCell.m in Sources */,
+				A035CE7C11E8731E00B6FBA3 /* Genie_1.0.6-1.2.0.xcmappingmodel in Sources */,
+				A035CEA111E8783F00B6FBA3 /* Genie_1.1-1.2.0.xcmappingmodel in Sources */,
+				A0828FAF11E8DF8400EECD2F /* NSManagedObject+Helpers.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1669,6 +1715,7 @@
 				A02EFB20115EDB7E00E580BE /* bnet-genie.cpp in Sources */,
 				A02EFB3C115EDD4300E580BE /* bncsutilinterface-genie.cpp in Sources */,
 				A02EFBAD115F7F5C00E580BE /* ghost-genie.cpp in Sources */,
+				A07A07B51169123300C42908 /* game-genie.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2240,13 +2287,16 @@
 			isa = XCVersionGroup;
 			children = (
 				770B37EC0679A11B001EADE2 /* Genie_DataModel.xcdatamodel */,
+				A07A06E71168E39800C42908 /* Genie_DataModel1.1.xcdatamodel */,
+				A03F3E49116528EA00EDA707 /* Genie_DataModel1.0.6.xcdatamodel */,
+				A0C9626F112082E100F7D965 /* Genie_DataModel1.0.5.xcdatamodel */,
 				A08C8070111B1D2000ABDD92 /* Genie_DataModel1.0.3.xcdatamodel */,
 				A08C81AD111B2CEE00ABDD92 /* Genie_DataModel1.0.3.xcmappingmodel */,
-				A0C9626F112082E100F7D965 /* Genie_DataModel1.0.5.xcdatamodel */,
-				A03F3E49116528EA00EDA707 /* Genie_DataModel1.0.6.xcdatamodel */,
+				A035CEA011E8783F00B6FBA3 /* Genie_1.1-1.2.0.xcmappingmodel */,
+				A035CE7B11E8731E00B6FBA3 /* Genie_1.0.6-1.2.0.xcmappingmodel */,
 				A03F1BA11167F808001DE85A /* Genie_1.0.6-1.1.xcmappingmodel */,
-				A03F1BBA1167F910001DE85A /* Genie_1.0.5-1.0.6.xcmappingmodel */,
 				A03F1BD41167FAAF001DE85A /* Genie_1.0.5-1.1.xcmappingmodel */,
+				A03F1BBA1167F910001DE85A /* Genie_1.0.5-1.0.6.xcmappingmodel */,
 			);
 			currentVersion = 770B37EC0679A11B001EADE2 /* Genie_DataModel.xcdatamodel */;
 			path = Genie_DataModel.xcdatamodeld;

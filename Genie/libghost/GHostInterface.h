@@ -19,17 +19,15 @@
  */
 
 #import <Cocoa/Cocoa.h>
-/*#ifdef __cplusplus
-//#import "ghost.h"
-class CGHost;
-class CConfig;
-#endif
-
 #ifdef __cplusplus
-#define FAKE_CXX_TYPE(type) type
+	class CGHost;
+	class CGHostGenie;
+	class CConfig;
+	class MessageLogger;
+	#define FAKE_CXX_TYPE(type) type
 #else
-#define FAKE_CXX_TYPE(type) void *
-#endif*/
+	#define FAKE_CXX_TYPE(type) void *
+#endif
 
 @class BotLocal;
 
@@ -47,22 +45,28 @@ class CConfig;
 - (void)userLeftChannel:(NSDictionary*)data;
 - (void)incomingFriendInfo:(NSDictionary*)data;
 - (void)incomingClanMemberInfo:(NSDictionary*)data;
-
+- (void)gameCreated:(NSDictionary*)data;
+- (void)gameDeleted:(NSDictionary*)data;
+- (void)gameRefreshed:(NSDictionary*)data;
+- (void)gameLoaded:(NSDictionary*)data;
 @end
 
 
 @interface GHostInterface : NSObject {
 	NSThread* ghostThread;
 	BOOL cancelled;
-	NSNumber* running;
+	BOOL running;
 	NSMutableArray *cmdQueue;
 	NSLock *cmdLock;
 	NSLock *mainLock;
 	NSObject <GHostDelegate> *delegate;
 	NSNumber *useRemoteHasher;
 	NSString *chatUsername;
+	
+	FAKE_CXX_TYPE(CGHostGenie *)instance;
+	FAKE_CXX_TYPE(CConfig *)cfg;
+	FAKE_CXX_TYPE(MessageLogger *)logger;
 }
-extern NSString * const GOutputReceived;
 - (void)startBotWithConfig:(NSDictionary *)config;
 - (void)stop;
 - (NSNumber*)getHostPort;
@@ -72,7 +76,7 @@ extern NSString * const GOutputReceived;
 - (void)releaseLock;
 - (void)sendChat:(NSDictionary*)message;
 @property (nonatomic, retain) NSString * chatUsername;
-@property (nonatomic, retain) NSNumber* running;
+@property (nonatomic) BOOL running;
 @property (nonatomic, readonly) NSNumber* useRemoteHasher;
 @property (assign) NSObject <GHostDelegate> *delegate;
 @end

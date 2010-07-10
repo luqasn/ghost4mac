@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="16"/>
+			<integer value="1"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -53,7 +53,7 @@
 							<object class="NSTabViewItem" id="338500901">
 								<string key="NSIdentifier">1</string>
 								<object class="NSView" key="NSView" id="1039212669">
-									<reference key="NSNextResponder" ref="71896884"/>
+									<nil key="NSNextResponder"/>
 									<int key="NSvFlags">256</int>
 									<object class="NSMutableArray" key="NSSubviews">
 										<bool key="EncodedWithXMLCoder">YES</bool>
@@ -132,7 +132,6 @@
 																	</object>
 																	<int key="NSResizingMask">3</int>
 																	<bool key="NSIsResizeable">YES</bool>
-																	<bool key="NSIsEditable">YES</bool>
 																	<reference key="NSTableView" ref="530109206"/>
 																</object>
 																<object class="NSTableColumn" id="976840861">
@@ -194,7 +193,6 @@
 																	</object>
 																	<int key="NSResizingMask">3</int>
 																	<bool key="NSIsResizeable">YES</bool>
-																	<bool key="NSIsEditable">YES</bool>
 																	<reference key="NSTableView" ref="530109206"/>
 																</object>
 																<object class="NSTableColumn" id="933249529">
@@ -221,7 +219,6 @@
 																	</object>
 																	<int key="NSResizingMask">3</int>
 																	<bool key="NSIsResizeable">YES</bool>
-																	<bool key="NSIsEditable">YES</bool>
 																	<reference key="NSTableView" ref="530109206"/>
 																</object>
 															</object>
@@ -467,7 +464,6 @@
 										</object>
 									</object>
 									<string key="NSFrameSize">{571, 344}</string>
-									<reference key="NSSuperview" ref="71896884"/>
 								</object>
 								<string key="NSLabel">Console</string>
 								<object class="NSColor" key="NSColor" id="250611520">
@@ -481,14 +477,14 @@
 							<object class="NSTabViewItem" id="575227327">
 								<string key="NSIdentifier">Item 1</string>
 								<object class="NSView" key="NSView" id="200314879">
-									<nil key="NSNextResponder"/>
+									<reference key="NSNextResponder" ref="71896884"/>
 									<int key="NSvFlags">256</int>
 									<object class="NSMutableArray" key="NSSubviews">
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<object class="NSPopUpButton" id="647859580">
 											<reference key="NSNextResponder" ref="200314879"/>
 											<int key="NSvFlags">289</int>
-											<string key="NSFrame">{{463, -3}, {111, 26}}</string>
+											<string key="NSFrame">{{463, -2}, {111, 26}}</string>
 											<reference key="NSSuperview" ref="200314879"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="58758935">
@@ -574,7 +570,7 @@
 																		<object class="NSTableView" id="111217132">
 																			<reference key="NSNextResponder" ref="10527315"/>
 																			<int key="NSvFlags">4352</int>
-																			<string key="NSFrameSize">{411, 303}</string>
+																			<string key="NSFrameSize">{411, 304}</string>
 																			<reference key="NSSuperview" ref="10527315"/>
 																			<bool key="NSEnabled">YES</bool>
 																			<object class="NSTableHeaderView" key="NSHeaderView" id="778873878">
@@ -614,7 +610,6 @@
 																						<int key="NSStyle">0</int>
 																						<bool key="NSAnimates">NO</bool>
 																					</object>
-																					<bool key="NSIsEditable">YES</bool>
 																					<reference key="NSTableView" ref="111217132"/>
 																				</object>
 																				<object class="NSTableColumn" id="682473815">
@@ -689,7 +684,6 @@
 																					</object>
 																					<int key="NSResizingMask">3</int>
 																					<bool key="NSIsResizeable">YES</bool>
-																					<bool key="NSIsEditable">YES</bool>
 																					<reference key="NSTableView" ref="111217132"/>
 																				</object>
 																				<object class="NSTableColumn" id="160925213">
@@ -735,7 +729,7 @@
 																			<int key="NSTableViewDraggingDestinationStyle">0</int>
 																		</object>
 																	</object>
-																	<string key="NSFrame">{{1, 17}, {411, 303}}</string>
+																	<string key="NSFrame">{{1, 17}, {411, 304}}</string>
 																	<reference key="NSSuperview" ref="703912335"/>
 																	<reference key="NSNextKeyView" ref="111217132"/>
 																	<reference key="NSDocView" ref="111217132"/>
@@ -777,7 +771,7 @@
 																</object>
 																<reference ref="124342330"/>
 															</object>
-															<string key="NSFrame">{{1, 0}, {413, 321}}</string>
+															<string key="NSFrame">{{1, 0}, {413, 322}}</string>
 															<reference key="NSSuperview" ref="354119715"/>
 															<reference key="NSNextKeyView" ref="10527315"/>
 															<int key="NSsFlags">562</int>
@@ -789,7 +783,7 @@
 															<bytes key="NSScrollAmts">QSAAAEEgAABBgAAAQYAAAA</bytes>
 														</object>
 													</object>
-													<string key="NSFrameSize">{413, 321}</string>
+													<string key="NSFrameSize">{413, 322}</string>
 													<reference key="NSSuperview" ref="843320549"/>
 													<string key="NSClassName">NSView</string>
 												</object>
@@ -811,7 +805,7 @@
 																		<object class="NSTableView" id="130976927">
 																			<reference key="NSNextResponder" ref="383484798"/>
 																			<int key="NSvFlags">4352</int>
-																			<string key="NSFrameSize">{158, 303}</string>
+																			<string key="NSFrameSize">{158, 304}</string>
 																			<reference key="NSSuperview" ref="383484798"/>
 																			<bool key="NSEnabled">YES</bool>
 																			<object class="NSTableHeaderView" key="NSHeaderView" id="623049099">
@@ -852,7 +846,6 @@
 																					</object>
 																					<int key="NSResizingMask">3</int>
 																					<bool key="NSIsResizeable">YES</bool>
-																					<bool key="NSIsEditable">YES</bool>
 																					<reference key="NSTableView" ref="130976927"/>
 																				</object>
 																				<object class="NSTableColumn" id="1055651556">
@@ -900,7 +893,7 @@
 																			<int key="NSTableViewDraggingDestinationStyle">1</int>
 																		</object>
 																	</object>
-																	<string key="NSFrame">{{1, 17}, {158, 303}}</string>
+																	<string key="NSFrame">{{1, 17}, {158, 304}}</string>
 																	<reference key="NSSuperview" ref="586430710"/>
 																	<reference key="NSNextKeyView" ref="130976927"/>
 																	<reference key="NSDocView" ref="130976927"/>
@@ -942,7 +935,7 @@
 																</object>
 																<reference ref="95079439"/>
 															</object>
-															<string key="NSFrameSize">{160, 321}</string>
+															<string key="NSFrameSize">{160, 322}</string>
 															<reference key="NSSuperview" ref="586485066"/>
 															<reference key="NSNextKeyView" ref="383484798"/>
 															<int key="NSsFlags">562</int>
@@ -954,12 +947,12 @@
 															<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 														</object>
 													</object>
-													<string key="NSFrame">{{414, 0}, {163, 321}}</string>
+													<string key="NSFrame">{{414, 0}, {163, 322}}</string>
 													<reference key="NSSuperview" ref="843320549"/>
 													<string key="NSClassName">NSView</string>
 												</object>
 											</object>
-											<string key="NSFrame">{{-3, 23}, {577, 321}}</string>
+											<string key="NSFrame">{{-3, 22}, {577, 322}}</string>
 											<reference key="NSSuperview" ref="200314879"/>
 											<bool key="NSIsVertical">YES</bool>
 											<int key="NSDividerStyle">2</int>
@@ -967,7 +960,7 @@
 										<object class="NSTextField" id="908915819">
 											<reference key="NSNextResponder" ref="200314879"/>
 											<int key="NSvFlags">290</int>
-											<string key="NSFrameSize">{464, 22}</string>
+											<string key="NSFrameSize">{466, 22}</string>
 											<reference key="NSSuperview" ref="200314879"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="1063763975">
@@ -988,20 +981,21 @@
 										</object>
 									</object>
 									<string key="NSFrameSize">{571, 344}</string>
+									<reference key="NSSuperview" ref="71896884"/>
 								</object>
 								<string key="NSLabel">Chat</string>
 								<reference key="NSColor" ref="250611520"/>
 								<reference key="NSTabView" ref="71896884"/>
 							</object>
 						</object>
-						<reference key="NSSelectedTabViewItem" ref="338500901"/>
+						<reference key="NSSelectedTabViewItem" ref="575227327"/>
 						<reference key="NSFont" ref="26"/>
 						<int key="NSTvFlags">134217734</int>
 						<bool key="NSAllowTruncatedLabels">YES</bool>
 						<bool key="NSDrawsBackground">YES</bool>
 						<object class="NSMutableArray" key="NSSubviews">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="1039212669"/>
+							<reference ref="200314879"/>
 						</object>
 					</object>
 				</object>

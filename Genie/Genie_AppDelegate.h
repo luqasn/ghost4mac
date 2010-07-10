@@ -40,6 +40,7 @@
 	
 	//IBOutlet NSArrayController *messagesController;
 	IBOutlet NSArrayController *botsController;
+	//IBOutlet NSTreeController *botTreeController;
 	IBOutlet NSView *contentView;
 	IBOutlet NSSegmentedControl *modeChanger;
 	
@@ -70,6 +71,8 @@
 - (IBAction)saveAction:sender;
 - (IBAction)openConfigWindow:sender;
 
+- (IBAction)addButtonPressed:(id)sender;
+- (IBAction)removeButtonPressed:(id)sender;
 - (IBAction)addRemoteBot:(id)sender;
 - (IBAction)addLocalBot:(id)sender;
 

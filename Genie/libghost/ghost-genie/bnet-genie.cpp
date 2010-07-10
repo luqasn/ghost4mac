@@ -46,10 +46,14 @@ CBNETGenie :: CBNETGenie( CGHostGenie *ghost, const CBNET *bnet, bool interceptH
 		bnet->m_War3Version, bnet->m_EXEVersion, bnet->m_EXEVersionHash, bnet->m_PasswordHashType, bnet->m_PVPGNRealmName,
 		bnet->m_MaxMessageLength, bnet->m_HostCounterID ), m_InterceptHashRequests(interceptHashRequests), m_GHostGenie( ghost )
 {
-	
-	delete m_BNCSUtil;
-	m_BNCSUtilGenie = new CBNCSUtilInterfaceGenie( this, bnet->m_UserName, bnet->m_UserPassword );
-	m_BNCSUtil = m_BNCSUtilGenie;
+	if (interceptHashRequests) {
+		delete m_BNCSUtil;
+		m_BNCSUtilGenie = new CBNCSUtilInterfaceGenie( this, bnet->m_UserName, bnet->m_UserPassword );
+		m_BNCSUtil = m_BNCSUtilGenie;
+	} else {
+		m_BNCSUtilGenie = NULL;
+	}
+
 }
 
 bool CBNETGenie :: InterceptPacket( CCommandPacket *packet )
@@ -58,7 +62,7 @@ bool CBNETGenie :: InterceptPacket( CCommandPacket *packet )
 	switch (sid) {
 		case CBNETProtocol :: SID_AUTH_INFO:
 			// don't intercept if we shouldn't
-			if( !m_InterceptHashRequests )
+			if( !m_InterceptHashRequests || m_BNCSUtilGenie )
 				return false;
 			m_Protocol->RECEIVE_SID_AUTH_INFO( packet->GetData( ) );
 			
@@ -187,6 +191,7 @@ void CBNETGenie :: QueueGameCreate( unsigned char state, string gameName, string
 void CBNETGenie :: QueueGameRefresh( unsigned char state, string gameName, string hostName, CMap *map, CSaveGame *saveGame, uint32_t upTime, uint32_t hostCounter )
 {
 	CBNET :: QueueGameRefresh( state, gameName, hostName, map, saveGame, upTime, hostCounter );
+	m_GHostGenie->EventGameRefreshed( m_GHost->m_CurrentGame, gameName, state );
 }
 
 void CBNETGenie :: ProcessChatEvent( CIncomingChatEvent *chatEvent )

@@ -23,6 +23,7 @@
 #import "ConfigBoolValueTransformer.h"
 #import "ConfigIntValueTransformer.h"
 #import "ConfigEntry.h"
+#import "NSManagedObject+Helpers.h"
 
 @implementation ConfigureLocalBotWindowController
 @synthesize selectedBot;
@@ -128,7 +129,11 @@
 
 - (IBAction)removeSetting:(id)sender
 {
-	[configSettings remove:sender];
+	NSEnumerator *e = [[configSettings selectedObjects] objectEnumerator];
+	ConfigEntry *entry;
+	while (entry = [e nextObject]) {
+		[entry deleteObjectFromContext];
+	}
 }
 
 - (void)openLogFile:(NSString*)file

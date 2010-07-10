@@ -28,11 +28,13 @@
 #import "FriendInfo.h"
 #import "ClanInfo.h"
 #import "MapEntry.h"
+#import "Game.h"
 
 #import "TCMPortMapper/TCMPortMapper.h"
 
 #import "Server.h"
 #import "ghost-genie.h"
+#import "game_base.h"
 #import "bnet.h"
 #import "config.h"
 #import "map.h"
@@ -58,6 +60,33 @@
     return [basePath stringByAppendingPathComponent:@"Genie"];
 }
 
+- (void)setRunning:(NSNumber *)status
+{
+	BOOL oldStatus = [_botInterface running];
+	
+	if (oldStatus == [status boolValue])
+		return;
+	
+	[self disableUndo];
+	[self willChangeValueForKey:@"running"];
+	[_running autorelease];
+	_running = [status retain];
+	[self didChangeValueForKey:@"running"];
+	[self enableUndo];
+	if ([status boolValue])
+		[self start];
+	else
+		[self stop];
+}
+
+- (NSNumber*)running
+{
+	[self willAccessValueForKey:@"running"];
+	NSNumber *num = _running;
+	[self didAccessValueForKey:@"running"];
+	return num;
+}
+
 - (void)setCurrentMap:(GMap *)map
 {
 	if(![self.running boolValue] || ![map mapfile])
@@ -81,16 +110,18 @@
 	CConfig *mapCfg = new CConfig( ghost );
 	
 	
-	string map_path;
+	string *map_path;
 	if (![map clientPath]) {
-		map_path = "Maps\\Download\\";
+		map_path = new string("Maps\\Download\\");
 	}
 	else {
-		map_path = [[map clientPath] UTF8String];
+		map_path = new string([[map clientPath] UTF8String]);
 	}
 
 	
-	mapCfg->Set( "map_path", map_path + [[relMapPath lastPathComponent] UTF8String] );
+	mapCfg->Set( "map_path", *map_path + [[relMapPath lastPathComponent] UTF8String] );
+	
+	delete map_path;
 	
 	mapCfg->Set( "map_localpath", [relMapPath UTF8String] );
 	
@@ -113,8 +144,9 @@
 		}
 	}
 	
-	//TODO: threadsafety?
+	[_botInterface getLock];
 	ghost->m_Map->Load( mapCfg, [relMapPath UTF8String] );
+	[_botInterface releaseLock];
 	delete mapCfg;
 }
 
@@ -182,6 +214,8 @@
 }
 
 - (void)portMapperDidStartWork:(NSNotification *)aNotification {
+	if ([[aNotification userInfo] valueForKey:@"bot"] != self)
+		return;
 	NSLog(@"Portmapper started for port %d", [portMapping localPort]);
 	[self performSelectorOnMainThread:@selector(consoleOutputCallback:)
 						   withObject:@"[GENIE] Starting port mapper"
@@ -189,6 +223,8 @@
 }
 
 - (void)portMapperDidFinishWork:(NSNotification *)aNotification {
+	if ([[aNotification userInfo] valueForKey:@"bot"] != self)
+		return;
     // since we only have one mapping this is fine
 	NSLog(@"Portmapper finished");
     if ([portMapping mappingStatus]==TCMPortMappingStatusMapped) {
@@ -207,6 +243,9 @@
 
 - (void)start
 {
+	[self willChangeValueForKey:@"botStatus"];
+	botStatus = BotStatusInitPhase;
+	[self didChangeValueForKey:@"botStatus"];
 	NSMutableDictionary *config = [NSMutableDictionary dictionaryWithCapacity:[[self settings] count]];
 	NSEnumerator *e = [[self settings] objectEnumerator];
 	while (ConfigEntry *entry = [e nextObject]) {
@@ -237,9 +276,10 @@
 	}
 	
 	NSString *motdFile = [self getTempFileName];
-	[[self motd] writeToFile:motdFile atomically:NO encoding:NSUTF8StringEncoding error:nil];
-	[config setObject:motdFile forKey:@"bot_motdfile"];
-	
+	if (motdFile) {
+		[[self motd] writeToFile:motdFile atomically:NO encoding:NSUTF8StringEncoding error:nil];
+		[config setObject:motdFile forKey:@"bot_motdfile"];
+	}
 	
 
 	NSBundle *thisBundle = [NSBundle mainBundle];
@@ -275,6 +315,11 @@
 	[config setObject:[baseDir stringByAppendingPathComponent:@"Warcraft III Maps"] forKey:@"bot_mappath"];
 	[config setObject:[baseDir stringByAppendingPathComponent:@"Map Configs"] forKey:@"bot_mapcfgpath"];
 	
+	if ([self.useRemoteHasher boolValue]) {
+		[config setObject:@"1" forKey:@"genie_remotehash"];
+	} else {
+		[config setObject:@"0" forKey:@"genie_remotehash"];
+	}	
 	
 	[self.botInterface startBotWithConfig:config];
 	/*[self disableUndo];
@@ -286,6 +331,10 @@
 {
 	if ([self.botInterface running])
 		[self.botInterface stop];
+	[self willChangeValueForKey:@"running"];
+	_running = [NSNumber numberWithBool:NO];
+	[self didChangeValueForKey:@"running"];
+	
 	/*[self disableUndo];
 	self.running = [NSNumber numberWithBool:NO];
 	[self enableUndo];*/
@@ -311,18 +360,12 @@
 {
 	chatUserName = nil;
 	_botInterface = nil;
+	/*[self willChangeValueForKey:@"running"];
+	running = [NSNumber numberWithBool:NO];
+	[self didChangeValueForKey:@"running"];*/
 	self.running = [NSNumber numberWithBool:NO];
 	TCMPortMapper *pm = [TCMPortMapper sharedInstance];
-	/*[[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(portMapperDidStartWork:)
-	 name:TCMPortMapperDidStartWorkNotification
-	 object:nil];
-    [[NSNotificationCenter defaultCenter]
-	 addObserver:self
-	 selector:@selector(portMapperDidFinishWork:)
-	 name:TCMPortMapperDidFinishWorkNotification
-	 object:nil];*/
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(portMapperDidStartWork:) 
 												 name:TCMPortMapperDidStartWorkNotification object:pm];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(portMapperDidFinishWork:)
@@ -339,18 +382,18 @@
 	}
 }
 
-/*- (void)observeValueForKeyPath:(NSString *)keyPath
+- (void)observeValueForKeyPath:(NSString *)keyPath
 					  ofObject:(id)object
 						change:(NSDictionary *)change
 					   context:(void *)context
 {
 	if ([keyPath isEqualToString:@"running"]) {
-		//NSLog(@"Change: %@", [object description]);
-		[self willChangeValueForKey:@"running"];
+		NSLog(@"Change: %@", [object description]);
+		/*[self willChangeValueForKey:@"running"];
 		_running = [[object running] copy];
-		[self didChangeValueForKey:@"running"];
+		[self didChangeValueForKey:@"running"];*/
 	}
-}*/
+}
 
 - (GHostInterface*)botInterface
 {
@@ -359,7 +402,7 @@
 		[_botInterface setDelegate:self];
 		//[_botInterface addObserver:self forKeyPath:@"running" options:nil context:nil];
 		[_botInterface bind:@"useRemoteHasher" toObject:self withKeyPath:@"useRemoteHasher" options:nil];
-		[self bind:@"running" toObject:_botInterface withKeyPath:@"running" options:nil];
+		//[self bind:@"running" toObject:_botInterface withKeyPath:@"running" options:nil];
 	}
 	return _botInterface;
 }
@@ -387,7 +430,8 @@
 {
 	[self disableUndo];
 	
-	ConsoleMessage *msg = [NSEntityDescription insertNewObjectForEntityForName:@"ConsoleMessage" inManagedObjectContext:[self managedObjectContext]];
+	//ConsoleMessage *msg = [NSEntityDescription insertNewObjectForEntityForName:@"ConsoleMessage" inManagedObjectContext:[self managedObjectContext/*getTemporaryContext*/]];
+	ConsoleMessage *msg = [self AddTemporaryEntity:@"ConsoleMessage"];
 	msg.date = [NSDate date];
 	msg.text = message;
 	msg.bot = self;
@@ -405,6 +449,23 @@
 	}
 }
 
+- (void)loadCSVFile:(NSValue*)ghost
+{
+	// set up autoreleasepool (needed because we are in a seperate thread)
+	NSAutoreleasePool *autoreleasepool= [[NSAutoreleasePool alloc] init];
+	
+	CGHostGenie* ghostPtr = (CGHostGenie*)[ghost pointerValue];
+	// TODO: add progress meter
+	string *csvFile = new string( [[[NSBundle mainBundle] pathForResource:@"ip-to-country" ofType:@"csv"] UTF8String] );
+	ghostPtr->LoadIPToCountryData( *csvFile );
+	delete csvFile;
+	
+	[self willChangeValueForKey:@"botStatus"];
+	botStatus = BotStatusRunning;
+	[self didChangeValueForKey:@"botStatus"];
+	[autoreleasepool release];
+}
+
 - (void)ghostCreated:(NSValue*)ghost
 {
 	CGHostGenie* ghostPtr = (CGHostGenie*)[ghost pointerValue];
@@ -412,7 +473,8 @@
 	int count = ghostPtr->m_BNETs.size();
 	for (int i=0; i<count; i++) {
 		NSString *alias = [NSString stringWithUTF8String:ghostPtr->m_BNETs[i]->GetServerAlias().c_str()];
-		Server *srv = [NSEntityDescription insertNewObjectForEntityForName:@"Server" inManagedObjectContext:[self managedObjectContext]];
+		//Server *srv = [NSEntityDescription insertNewObjectForEntityForName:@"Server" inManagedObjectContext:[self managedObjectContext/*getTemporaryContext*/]];
+		Server *srv = [self AddTemporaryEntity:@"Server"];
 		srv.name = alias;
 		srv.bot = self;
 		void* bnet = ghostPtr->m_BNETs[i];
@@ -432,7 +494,7 @@
 		portMapping = [[TCMPortMapping portMappingWithLocalPort:[[self.botInterface getHostPort] intValue]
 										   desiredExternalPort:[[self.botInterface getHostPort] intValue]
 											 transportProtocol:TCMPortMappingTransportProtocolTCP
-													  userInfo:nil] retain];
+													  userInfo:[NSDictionary dictionaryWithObject:self forKey:@"bot"]] retain];
 		[pm addPortMapping:portMapping];
 		[pm start];
 	}
@@ -440,6 +502,12 @@
 	if (self.startupMap) {
 		self.currentMap = self.startupMap;
 	}
+	
+	[self willChangeValueForKey:@"botStatus"];
+	botStatus = BotStatusLoadingCSV;
+	[self didChangeValueForKey:@"botStatus"];
+	
+	[self performSelectorInBackground:@selector(loadCSVFile:) withObject:ghost];
 }
 
 /*- (void)sendCommand:(NSDictionary *)cmd
@@ -486,11 +554,75 @@
 				[chan release];
 				server.channel = nil;
 			}
-			chan = [NSEntityDescription insertNewObjectForEntityForName:@"Channel" inManagedObjectContext:[self managedObjectContext]];
+			//chan = [NSEntityDescription insertNewObjectForEntityForName:@"Channel" inManagedObjectContext:[self managedObjectContext]];
+			chan = [self AddTemporaryEntity:@"Channel"];
 			chan.name = channel;
 			chan.server = server;
 			server.channel = chan;
 		}
+	}
+}
+
+- (Game*)getGameFromPointer:(NSValue*)gamePtr createNew:(BOOL)createNew
+{
+	NSEnumerator *e = [self.games objectEnumerator];
+	Game *game;
+	while (game = [e nextObject]) {
+		if ([game.gameObject pointerValue] == [gamePtr pointerValue]) {
+			return game;
+		}
+	}
+	if (createNew) {
+		CBaseGame *gameobj = (CBaseGame*)[gamePtr pointerValue];
+		//game = [NSEntityDescription insertNewObjectForEntityForName:@"Game" inManagedObjectContext:[self managedObjectContext/*getTemporaryContext*/]];
+		game = [self AddTemporaryEntity:@"Game"];
+		game.bot = self;
+		game.gameObject = gamePtr;
+		game.status = [NSNumber numberWithInt:GameStatusLobby];
+		game.name = [NSString stringWithUTF8String:gameobj->GetGameName().c_str()];
+		[self addGamesObject:game];
+		return game;
+	} else {
+		return nil;
+	}
+}
+
+- (void)gameCreated:(NSDictionary*)data
+{
+	NSValue *gameptr = [data objectForKey:@"game"];
+	Game *game = [self getGameFromPointer:gameptr createNew:YES];
+	if (game) {
+		// nothing yet
+	}
+}
+
+- (void)gameDeleted:(NSDictionary*)data
+{
+	NSValue *gameptr = [data objectForKey:@"game"];
+	Game *game = [self getGameFromPointer:gameptr createNew:NO];
+	if (game) {
+		game.status = [NSNumber numberWithInt:GameStatusClosed];
+	}
+}
+
+- (void)gameRefreshed:(NSDictionary*)data
+{
+	NSValue *gameptr = [data objectForKey:@"game"];
+	Game *game = [self getGameFromPointer:gameptr createNew:NO];
+	if (game) {
+		CBaseGame *gameobj = (CBaseGame*)[gameptr pointerValue];
+		game.name = [NSString stringWithUTF8String:gameobj->GetGameName().c_str()];
+	}
+}
+
+- (void)gameLoaded:(NSDictionary*)data
+{
+	NSValue *gameptr = [data objectForKey:@"game"];
+	Game *game = [self getGameFromPointer:gameptr createNew:NO];
+	if (game) {
+		game.status = [NSNumber numberWithInt:GameStatusRunning];
+		//CBaseGame *gameobj = (CBaseGame*)[gameptr pointerValue];
+		//game.name = [NSString stringWithUTF8String:gameobj->GetGameName().c_str()];
 	}
 }
 
@@ -535,7 +667,8 @@
 		User *usr = [server getUserForNick:user];
 		
 		if (!usr.friendInfo)
-			usr.friendInfo = [NSEntityDescription insertNewObjectForEntityForName:@"FriendInfo" inManagedObjectContext:[self managedObjectContext]];
+			usr.friendInfo = [self AddTemporaryEntity:@"FriendInfo"];
+			//usr.friendInfo = [NSEntityDescription insertNewObjectForEntityForName:@"FriendInfo" inManagedObjectContext:[self managedObjectContext/*getTemporaryContext*/]];
 		
 		NSArray *parts = [status componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 		if ([parts count] >= 4)
@@ -561,7 +694,8 @@
 	Server *server = [self getServerFromBNETPointer:bnet];
 	if (server) {
 		User *usrObj = [server getUserForNick:user];
-		ChatMessage *msgObj = [NSEntityDescription insertNewObjectForEntityForName:@"ChatMessage" inManagedObjectContext:[self managedObjectContext]];
+		//ChatMessage *msgObj = [NSEntityDescription insertNewObjectForEntityForName:@"ChatMessage" inManagedObjectContext:[self managedObjectContext/*getTemporaryContext*/]];
+		ChatMessage *msgObj = [self AddTemporaryEntity:@"ChatMessage"];
 		msgObj.date = [NSDate date];
 		msgObj.channel = server.channel;
 		msgObj.text = message;
@@ -580,7 +714,8 @@
 	Server *server = [self getServerFromBNETPointer:bnet];
 	if (server) {
 		User *usrObj = [server getUserForNick:user];
-		ChatMessage *msgObj = [NSEntityDescription insertNewObjectForEntityForName:@"ChatMessage" inManagedObjectContext:[self managedObjectContext]];
+		ChatMessage *msgObj = [self AddTemporaryEntity:@"ChatMessage"];
+		//ChatMessage *msgObj = [NSEntityDescription insertNewObjectForEntityForName:@"ChatMessage" inManagedObjectContext:[self managedObjectContext/*getTemporaryContext*/]];
 		msgObj.date = [NSDate date];
 		msgObj.channel = nil;
 		msgObj.text = message;

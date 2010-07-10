@@ -19,7 +19,9 @@ typedef void (*ProgressNotificationCallback)( void* callbackObject, int percent 
 
 typedef enum GameEventType {
 	GameEventTypeCreated,
-	GameEventTypeDeleted
+	GameEventTypeDeleted,
+	GameEventTypeRefreshed,
+	GameEventTypeLoaded
 } GameEventType;
 typedef struct GameEventData {
 	GameEventType event;
@@ -102,6 +104,9 @@ public:
 	virtual void EventBNETEmote( CBNET *bnet, string user, string message );
 	virtual void CreateGame( CMap *map, unsigned char gameState, bool saveGame, string gameName, string ownerName, string creatorName, string creatorServer, bool whisper );
 	virtual void EventGameDeleted( CBaseGame *game );
+	
+	virtual void EventGameRefreshed( CBaseGame* game, const string &gamename, unsigned char state );
+	virtual void EventGameLoaded( CBaseGame* game );
 
 	virtual void LoadIPToCountryData( );
 	

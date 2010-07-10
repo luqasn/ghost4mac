@@ -21,10 +21,18 @@
 #import <CoreData/CoreData.h>
 #import "GBotProtocol.h"
 
+enum {
+    BotStatusStopped,
+    BotStatusInitPhase,
+	BotStatusLoadingCSV,
+	BotStatusRunning
+};
+typedef NSUInteger BotStatus;
 
 @interface Bot :  NSManagedObject <GBotProtocol>
 {
 	NSNumber *running;
+	BotStatus botStatus;
 }
 @property (nonatomic, retain) NSNumber * autoStart;
 @property (nonatomic, retain) NSString * name;
@@ -33,10 +41,13 @@
 @property (nonatomic, retain) NSString * version;
 @property (nonatomic, retain) NSString * comment;
 @property (nonatomic, retain) NSNumber * running;
+//@property (nonatomic, retain) NSNumber * startIndicator;
 @property (nonatomic, retain) NSSet* messages;
 @property (nonatomic, retain) NSSet* games;
 @property (nonatomic, retain) NSSet* servers;
+@property (nonatomic, readonly) BotStatus botStatus;
 - (void)sendCommand:(NSDictionary *)cmd;
+- (id)AddTemporaryEntity:(NSString*)entity;
 @end
 
 

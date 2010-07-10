@@ -34,17 +34,13 @@ class CGHostGenie;
 class CConfig;
 
 @interface GHostInterface (PRIVATE) 
-	CGHostGenie *instance;
-	CConfig *cfg;
-	MessageLogger *logger;
+	
 @end
 
 
 @implementation GHostInterface
-NSString * const GOutputReceived = @"GOutputReceived";
 
 @synthesize chatUsername;
-
 @synthesize running;
 @synthesize delegate;
 @synthesize useRemoteHasher;
@@ -55,7 +51,7 @@ NSString * const GOutputReceived = @"GOutputReceived";
 }
 
 - (void)lineReceived:(NSString*)message {
-	//NSLog(@"RECEIVED: '%@'", message);
+	NSLog(@"RECEIVED: '%@'", message);
 	
 	// switch from GHost thread to mainThread when leaving GHost context because
 	// a) the message needs to be added to the managedObjectContext later which
@@ -119,14 +115,18 @@ NSString * const GOutputReceived = @"GOutputReceived";
 	if (exeInfo == nil || exeVersion == nil || exeVersionHash == nil) {
 		[self lineReceived:@"[GENIE] Error getting hash from server"];
 		[mainLock lock];
-		bnet->ProcessFileHashes(string(), 0, 0);
+		string *emptyString = new string();
+		bnet->ProcessFileHashes(*emptyString, 0, 0);
+		delete emptyString;
 		[mainLock unlock];
 	} else {
 		[self lineReceived:@"[GENIE] Got hash from server"];
-		NSLog(@"EXEVersion: '%@'\tEXEVersionHash: '%@'\tEXEInfo: '%@'", exeVersion, exeVersionHash, exeInfo);
+		//NSLog(@"EXEVersion: '%@'\tEXEVersionHash: '%@'\tEXEInfo: '%@'", exeVersion, exeVersionHash, exeInfo);
 		NSLog(@"EXEVersion: '%ld'\tEXEVersionHash: '%ld'\tEXEInfo: '%@'", [exeVersion longLongValue], [exeVersionHash longLongValue], exeInfo);
 		[mainLock lock];
-		bnet->ProcessFileHashes( string([exeInfo UTF8String]), [exeVersion longLongValue], [exeVersionHash longLongValue]);
+		string *exeInfoString = new string([exeInfo UTF8String]);
+		bnet->ProcessFileHashes(*exeInfoString, [exeVersion longLongValue], [exeVersionHash longLongValue]);
+		delete exeInfoString;
 		[mainLock unlock];
 	}
 }
@@ -158,11 +158,13 @@ NSString * const GOutputReceived = @"GOutputReceived";
 	
 	NSMutableDictionary *hashInfo = [NSMutableDictionary dictionaryWithCapacity:7];
 	[hashInfo addEntriesFromDictionary:data];
-	[hashInfo addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfURL:url]];
-	
-	//[self performSelector:@selector(processHashData:) onThread:ghostThread withObject:hashInfo waitUntilDone:NO];
-	//TODO: thread safety!
-	[self processHashData:hashInfo];
+	NSDictionary *serverResponse = [NSDictionary dictionaryWithContentsOfURL:url];
+	if (serverResponse) {
+		[hashInfo addEntriesFromDictionary:serverResponse];
+		//[self performSelector:@selector(processHashData:) onThread:ghostThread withObject:hashInfo waitUntilDone:NO];
+		//TODO: thread safety!
+		[self processHashData:hashInfo];
+	}
 	
 	[autoreleasepool release];
 }
@@ -241,6 +243,34 @@ static void GHostBNETMessageCallback(void* callbackObject, const BNETEventData &
 	}
 }
 
+static void GHostGameEventCallback(void* callbackObject, const GameEventData &data )
+{
+	GHostInterface *_self = (GHostInterface *)callbackObject;
+	NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
+						  [NSValue valueWithPointer:data.game],@"game", nil];
+	SEL target = nil;
+	switch (data.event) {
+		case GameEventTypeCreated:
+			target = @selector(gameCreated:);
+			break;
+		case GameEventTypeDeleted:
+			target = @selector(gameDeleted:);
+			break;
+		case GameEventTypeRefreshed:
+			target = @selector(gameRefreshed:);
+			break;
+		case GameEventTypeLoaded:
+			target = @selector(gameLoaded:);
+			break;
+	}
+
+	if (target) {
+		[[_self delegate] performSelectorOnMainThread:target
+										   withObject:dict
+										waitUntilDone:NO];
+	}
+}
+
 - (void)sendChat:(NSDictionary *)cmd
 {
 	[mainLock lock];
@@ -270,17 +300,15 @@ static void GHostBNETMessageCallback(void* callbackObject, const BNETEventData &
 	// set priority to high
 	[NSThread setThreadPriority:1.0];
 	
-	[self willChangeValueForKey:@"running"];
-	running = [NSNumber numberWithBool:YES];
-	[self didChangeValueForKey:@"running"];
-	cancelled = NO;
 	
+	self.running = YES;
+	cancelled = NO;
 	instance = new CGHostGenie(logger, cfg);
-	// TODO: progress meter via callback
-	instance->LoadIPToCountryData(string([[[NSBundle mainBundle] pathForResource:@"ip-to-country" ofType:@"csv"] UTF8String]));
+	
 	
 	instance->RegisterCallbackObject((void*)self);
 	instance->RegisterBNETCallback(&GHostBNETMessageCallback);
+	instance->RegisterGameCallback(&GHostGameEventCallback);
 	//instance->RegisterBNETCallback(&GHostBNETMessageCallback, (void*)self);
 	if ([useRemoteHasher boolValue])
 		instance->RegisterHashCallback(&GHostBNETHashCallback);
@@ -289,8 +317,14 @@ static void GHostBNETMessageCallback(void* callbackObject, const BNETEventData &
 	
 	if (delegate) {
 		[delegate performSelectorOnMainThread:@selector(ghostCreated:) withObject:[NSValue valueWithPointer:instance] waitUntilDone:YES];
+	} else {
+		string *csvFile = new string( [[[NSBundle mainBundle] pathForResource:@"ip-to-country" ofType:@"csv"] UTF8String] );
+		instance->LoadIPToCountryData( *csvFile );
+		delete csvFile;
 	}
 
+	
+	
 	while (!cancelled) {
 		// don't wait for locking in order to keep blocking of this thread to a minimum
 		// it is not critical if we miss this once or twice anyway
@@ -328,20 +362,18 @@ static void GHostBNETMessageCallback(void* callbackObject, const BNETEventData &
 		}
 		[mainLock unlock];
 	}
-	instance->m_ExitingNice = TRUE;
+	instance->m_ExitingNice = FALSE;
 	instance->Update(1);
 	if (delegate) {
 		[delegate performSelectorOnMainThread:@selector(ghostTerminates:) withObject:[NSValue valueWithPointer:instance] waitUntilDone:YES];
 	}
-
+	
 	delete cfg;
 	cfg = nil;
 	delete instance;
 	instance = nil;
-	[self willChangeValueForKey:@"running"];
-	running = [NSNumber numberWithBool:NO];
-	[self didChangeValueForKey:@"running"];
-	
+
+	self.running = NO;
 	[autoreleasepool release];
 }
 
@@ -349,32 +381,12 @@ static void GHostBNETMessageCallback(void* callbackObject, const BNETEventData &
 {
 	[mainLock lock];
 }
+
 - (void)releaseLock;
 {
 	[mainLock unlock];
 }
 
-/*int count = instance->m_BNETs.size();
- for (int i=0; i<count; i++) {
- NSString *target = [cmd valueForKey:@"server"];
- NSString *server = [NSString
- stringWithUTF8String:instance->m_BNETs[i]->GetServerAlias().c_str()];
- // do we have no target or
- // was the command meant to be executed on this server?
- if (!target || ![target length] || [target isEqualToString:server]) {
- char trigger = instance->m_BNETs[i]->GetCommandTrigger();
- std::string command = string([[cmd valueForKey:@"command"] UTF8String]);
- command.insert(0, 1, trigger);
- 
- CIncomingChatEvent *event = new CIncomingChatEvent(CBNETProtocol::EID_WHISPER,
- 0,
- instance->m_BNETs[i]->GetRootAdmin(),
- command);
- instance->m_BNETs[i]->ProcessChatEvent( event );
- delete event;
- break;
- }
- }*/
 - (NSValue*)ghostInstance
 {
 	return [NSValue valueWithPointer:instance];
@@ -387,6 +399,7 @@ static void GHostBNETMessageCallback(void* callbackObject, const BNETEventData &
 }
 - (void)startBotWithConfig:(NSDictionary *)config {
 	if (![ghostThread isExecuting]) {
+		NSLog(@"STARTING BOT");
 		//botObject = bot;
 		// release old object
 		[ghostThread autorelease];
@@ -394,22 +407,26 @@ static void GHostBNETMessageCallback(void* callbackObject, const BNETEventData &
 		ghostThread = [[NSThread alloc] initWithTarget:self
 											 selector:@selector(runLoop:)
 											   object:nil];
-		[ghostThread setName:@"GHostRunloop"];
-		
+		static int i=0;
+		[ghostThread setName:[NSString stringWithFormat:@"GHostRunloop-%d", ++i]];
 		
 		if (cfg != nil)
 			delete cfg;
-		cfg = new CConfig( NULL );
+		cfg = new CConfig( logger );
 		
 		NSEnumerator *e = [config keyEnumerator];
 		NSString *key;
 		while (key = [e nextObject]) {
-			const char *a = [key UTF8String];
+			string *keyName = new string( [key UTF8String] );
 			const char *b = [[config objectForKey:key] UTF8String];
-			string val = string( );
-			if (b != NULL)
-				val = string(b);
-			cfg->Set(string(a), val);
+			string *val = new string( );
+			if (b != NULL) {
+				delete val;
+				val = new string( b );
+			}
+			cfg->Set(*keyName, *val);
+			//delete val;
+			//delete keyName;
 		}
 		
 		[ghostThread start];  // Actually create and start the thread
@@ -422,7 +439,6 @@ static void GHostBNETMessageCallback(void* callbackObject, const BNETEventData &
 	if (self = [super init]) {
 		chatUsername = nil;
 		instance = nil;
-		running = NO;
 		useRemoteHasher = [NSNumber numberWithBool:YES];
 		cmdQueue = [[NSMutableArray arrayWithCapacity:5] retain];
 		cmdLock = [[NSLock alloc] init];

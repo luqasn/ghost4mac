@@ -24,6 +24,6 @@
 @protocol GBotProtocol
 - (void)start;
 - (void)stop;
-//- (void)startStop;
+- (void)startStop;
 //- (void)sendCommand:(NSDictionary *)cmd;
 @end

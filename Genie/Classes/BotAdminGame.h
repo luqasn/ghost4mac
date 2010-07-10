@@ -11,14 +11,14 @@
 
 @class AsyncSocket;
 
-enum {
+/*enum {
     LANGameStatusNone = 0,
     LANGameStatusJoinRequested = 1,
 	LANGameStatusJoined = 2,
 	LANGameStatusLoggingIn = 3,
 	LANGameStatusLoggedIn = 4
 };
-typedef NSUInteger LANGameStatus;
+typedef NSUInteger LANGameStatus;*/
 
 #define W3GS_HEADER_CONSTANT		247
 enum WC3Protocol {

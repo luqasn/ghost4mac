@@ -19,20 +19,24 @@
  */
 
 #import "GameStatusImageValueTransformer.h"
+#import "Game.h"
 
 
 @implementation GameStatusImageValueTransformer
-//+ (Class)transformedValueClass { return [NSInteger class]; }
++ (Class)transformedValueClass { return [NSImage class]; }
 + (BOOL)allowsReverseTransformation { return NO; }
-/*- (id)transformedValue:(id)value {
+- (id)transformedValue:(id)value {
 	
-	NSInteger *val = value;
+	NSNumber *val = value;
 	
-	if(![val compare:[NSNumber numberWithInt:0]]) {
-		return [NSImage imageNamed:@"RedDot.png"];
-	} else if (![val compare:[NSNumber numberWithInt:1]] {
-		return [NSImage imageNamed:@"GreenDot.png"];
+	switch ([val intValue]) {
+		case GameStatusLobby:
+			return [NSImage imageNamed:@"YellowDot.png"];
+		case GameStatusClosed:
+			return [NSImage imageNamed:@"RedDot.png"];
+		case GameStatusRunning:
+			return [NSImage imageNamed:@"GreenDot.png"];
 	}
-	return [NSImage imageNamed:@"YellowDot.png"];
-}*/
+	return nil;
+}
 @end

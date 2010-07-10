@@ -10,7 +10,9 @@
 
 #import "Bot.h"
 
-@implementation Game 
+@implementation Game
+
+@synthesize gameObject;
 
 @dynamic status;
 @dynamic id;
@@ -19,5 +21,11 @@
 @dynamic messages;
 @dynamic bot;
 @dynamic players;
+@synthesize dateCreated;
+
+-(void)awakeFromInsert
+{
+	self.dateCreated = [NSCalendarDate date];
+}
 
 @end
