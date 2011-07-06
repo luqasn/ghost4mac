@@ -10,8 +10,9 @@
 
 @class Server;
 @class User;
+@class ChatMessage;
 
-@interface Channel :  NSManagedObject  
+@interface Channel : NSObject
 {
 }
 
@@ -24,8 +25,8 @@
 
 
 @interface Channel (CoreDataGeneratedAccessors)
-- (void)addMessagesObject:(NSManagedObject *)value;
-- (void)removeMessagesObject:(NSManagedObject *)value;
+- (void)addMessagesObject:(ChatMessage *)value;
+- (void)removeMessagesObject:(ChatMessage *)value;
 - (void)addMessages:(NSSet *)value;
 - (void)removeMessages:(NSSet *)value;
 

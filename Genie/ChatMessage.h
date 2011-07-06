@@ -12,7 +12,7 @@
 @class Channel;
 @class User;
 
-@interface ChatMessage :  Message  
+@interface ChatMessage : Message
 {
 }
 

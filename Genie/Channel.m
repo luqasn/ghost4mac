@@ -13,9 +13,9 @@
 
 @implementation Channel 
 
-@dynamic name;
-@dynamic messages;
-@dynamic users;
-@dynamic server;
+@synthesize name;
+@synthesize messages;
+@synthesize users;
+@synthesize server;
 
 @end

@@ -11,7 +11,7 @@
 
 @class Bot;
 
-@interface ConsoleMessage :  Message  
+@interface ConsoleMessage : Message
 {
 }
 

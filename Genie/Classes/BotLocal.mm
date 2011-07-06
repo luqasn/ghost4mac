@@ -431,7 +431,7 @@
 	[self disableUndo];
 	
 	//ConsoleMessage *msg = [NSEntityDescription insertNewObjectForEntityForName:@"ConsoleMessage" inManagedObjectContext:[self managedObjectContext/*getTemporaryContext*/]];
-	ConsoleMessage *msg = [self AddTemporaryEntity:@"ConsoleMessage"];
+	ConsoleMessage *msg = [ConsoleMessage new];
 	msg.date = [NSDate date];
 	msg.text = message;
 	msg.bot = self;
@@ -555,7 +555,7 @@
 				server.channel = nil;
 			}
 			//chan = [NSEntityDescription insertNewObjectForEntityForName:@"Channel" inManagedObjectContext:[self managedObjectContext]];
-			chan = [self AddTemporaryEntity:@"Channel"];
+			chan = [Channel new];
 			chan.name = channel;
 			chan.server = server;
 			server.channel = chan;
@@ -667,7 +667,7 @@
 		User *usr = [server getUserForNick:user];
 		
 		if (!usr.friendInfo)
-			usr.friendInfo = [self AddTemporaryEntity:@"FriendInfo"];
+			usr.friendInfo = [FriendInfo new];
 			//usr.friendInfo = [NSEntityDescription insertNewObjectForEntityForName:@"FriendInfo" inManagedObjectContext:[self managedObjectContext/*getTemporaryContext*/]];
 		
 		NSArray *parts = [status componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
@@ -695,7 +695,7 @@
 	if (server) {
 		User *usrObj = [server getUserForNick:user];
 		//ChatMessage *msgObj = [NSEntityDescription insertNewObjectForEntityForName:@"ChatMessage" inManagedObjectContext:[self managedObjectContext/*getTemporaryContext*/]];
-		ChatMessage *msgObj = [self AddTemporaryEntity:@"ChatMessage"];
+		ChatMessage *msgObj = [ChatMessage new];
 		msgObj.date = [NSDate date];
 		msgObj.channel = server.channel;
 		msgObj.text = message;
@@ -714,7 +714,7 @@
 	Server *server = [self getServerFromBNETPointer:bnet];
 	if (server) {
 		User *usrObj = [server getUserForNick:user];
-		ChatMessage *msgObj = [self AddTemporaryEntity:@"ChatMessage"];
+		ChatMessage *msgObj = [ChatMessage new];
 		//ChatMessage *msgObj = [NSEntityDescription insertNewObjectForEntityForName:@"ChatMessage" inManagedObjectContext:[self managedObjectContext/*getTemporaryContext*/]];
 		msgObj.date = [NSDate date];
 		msgObj.channel = nil;

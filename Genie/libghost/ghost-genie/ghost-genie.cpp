@@ -36,8 +36,7 @@ ip2countryCallback( NULL)
 	vector<CBNET*> newBNETs;
 	for( vector<CBNET *> :: iterator i = m_BNETs.begin( ); i != m_BNETs.end( ); i++ )
 	{
-		CBNET *o = *i;
-		CBNETGenie *bnet = new CBNETGenie( this, o, enableRemoteHash );
+		CBNETGenie *bnet = new CBNETGenie( this, *i, enableRemoteHash );
 		newBNETs.push_back( bnet );
 	}
 	// swap bnet lists

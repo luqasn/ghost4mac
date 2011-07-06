@@ -25,9 +25,27 @@
 @dynamic loggedIn;
 @dynamic ignoreRefreshMessages;
 
+- (void) setRunning:(NSNumber *)status
+{
+	if ([status boolValue] == [running boolValue])
+		return;
+	[running autorelease];
+	running = [status retain];
+	if ([running boolValue])
+		[self start];
+	else {
+		[self stop];
+	}
+}
+
+- (NSNumber*)running
+{
+	return running;
+}
+
 - (void)messageReceived:(NSString*)message
 {
-	ConsoleMessage *msg = [NSEntityDescription insertNewObjectForEntityForName:@"ConsoleMessage" inManagedObjectContext:[self managedObjectContext]];
+	ConsoleMessage *msg = [ConsoleMessage new];
 	msg.date = [NSDate date];
 	msg.text = message;
 	msg.bot = self;

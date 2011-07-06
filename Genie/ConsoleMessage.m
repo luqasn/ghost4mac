@@ -12,6 +12,6 @@
 
 @implementation ConsoleMessage 
 
-@dynamic bot;
+@synthesize bot;
 
 @end

@@ -27,7 +27,7 @@
 
 - (void)setBot:(Bot *)newBot
 {
-	[newBot addObserver:self forKeyPath:@"games" options:nil context:NULL];
+	[newBot addObserver:self forKeyPath:@"games" options:nil context:nil];
 	bot = newBot;
 }
 

@@ -21,7 +21,7 @@
 #import <CoreData/CoreData.h>
 
 
-@interface Message :  NSManagedObject  
+@interface Message : NSObject
 {
 }
 

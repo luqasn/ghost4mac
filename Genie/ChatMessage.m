@@ -13,8 +13,8 @@
 
 @implementation ChatMessage 
 
-@dynamic channel;
-@dynamic sender;
+@synthesize channel;
+@synthesize sender;
 
 - (NSImage*)icon
 {

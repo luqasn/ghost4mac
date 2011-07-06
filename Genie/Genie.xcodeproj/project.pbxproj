@@ -249,6 +249,7 @@
 		A0A3907A10F16FD2007A4260 /* libghost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0A3892810F14257007A4260 /* libghost.framework */; };
 		A0A3907E10F17029007A4260 /* GHostInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = A0A38DB010F15398007A4260 /* GHostInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A0A3912A10F17A92007A4260 /* libghost.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = A0A3892810F14257007A4260 /* libghost.framework */; };
+		A0BFB63E122306F600CCA087 /* Genie_1.2.0-1.2.1.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = A0BFB63D122306F600CCA087 /* Genie_1.2.0-1.2.1.xcmappingmodel */; };
 		A0C962731120845D00F7D965 /* BotAdminGame.m in Sources */ = {isa = PBXBuildFile; fileRef = A0C962721120845D00F7D965 /* BotAdminGame.m */; };
 		A0C962761120871700F7D965 /* NSData+BinaryHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = A0C962751120871700F7D965 /* NSData+BinaryHelpers.m */; };
 		A0C962E311208DA400F7D965 /* ConfigureAdminGameWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A0C962E211208DA400F7D965 /* ConfigureAdminGameWindowController.m */; };
@@ -632,6 +633,8 @@
 		A0A38ED310F15D4B007A4260 /* libpthread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpthread.dylib; path = usr/lib/libpthread.dylib; sourceTree = SDKROOT; };
 		A0A38F9210F15DDA007A4260 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = usr/lib/libssl.dylib; sourceTree = SDKROOT; };
 		A0A38FA110F15E9B007A4260 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		A0BFB63A122306A200CCA087 /* Genie_DataModel1.2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Genie_DataModel1.2.xcdatamodel; sourceTree = "<group>"; };
+		A0BFB63D122306F600CCA087 /* Genie_1.2.0-1.2.1.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = "Genie_1.2.0-1.2.1.xcmappingmodel"; sourceTree = "<group>"; };
 		A0C9626F112082E100F7D965 /* Genie_DataModel1.0.5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Genie_DataModel1.0.5.xcdatamodel; sourceTree = "<group>"; };
 		A0C962711120845D00F7D965 /* BotAdminGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BotAdminGame.h; path = Classes/BotAdminGame.h; sourceTree = "<group>"; };
 		A0C962721120845D00F7D965 /* BotAdminGame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BotAdminGame.m; path = Classes/BotAdminGame.m; sourceTree = "<group>"; };
@@ -1491,7 +1494,14 @@
 			};
 			buildConfigurationList = 26FC0A880875C7B200E6366F /* Build configuration list for PBXProject "Genie" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Genie */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1646,6 +1656,7 @@
 				A035CE7C11E8731E00B6FBA3 /* Genie_1.0.6-1.2.0.xcmappingmodel in Sources */,
 				A035CEA111E8783F00B6FBA3 /* Genie_1.1-1.2.0.xcmappingmodel in Sources */,
 				A0828FAF11E8DF8400EECD2F /* NSManagedObject+Helpers.m in Sources */,
+				A0BFB63E122306F600CCA087 /* Genie_1.2.0-1.2.1.xcmappingmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2287,11 +2298,13 @@
 			isa = XCVersionGroup;
 			children = (
 				770B37EC0679A11B001EADE2 /* Genie_DataModel.xcdatamodel */,
+				A0BFB63A122306A200CCA087 /* Genie_DataModel1.2.xcdatamodel */,
 				A07A06E71168E39800C42908 /* Genie_DataModel1.1.xcdatamodel */,
 				A03F3E49116528EA00EDA707 /* Genie_DataModel1.0.6.xcdatamodel */,
 				A0C9626F112082E100F7D965 /* Genie_DataModel1.0.5.xcdatamodel */,
 				A08C8070111B1D2000ABDD92 /* Genie_DataModel1.0.3.xcdatamodel */,
 				A08C81AD111B2CEE00ABDD92 /* Genie_DataModel1.0.3.xcmappingmodel */,
+				A0BFB63D122306F600CCA087 /* Genie_1.2.0-1.2.1.xcmappingmodel */,
 				A035CEA011E8783F00B6FBA3 /* Genie_1.1-1.2.0.xcmappingmodel */,
 				A035CE7B11E8731E00B6FBA3 /* Genie_1.0.6-1.2.0.xcmappingmodel */,
 				A03F1BA11167F808001DE85A /* Genie_1.0.6-1.1.xcmappingmodel */,

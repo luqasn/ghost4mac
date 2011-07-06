@@ -383,7 +383,7 @@
  */
 
 - (NSPersistentStoreCoordinator *) persistentStoreCoordinator {
-
+	
     if (persistentStoreCoordinator) return persistentStoreCoordinator;
 
     NSManagedObjectModel *mom = [self managedObjectModel];
@@ -412,37 +412,39 @@
 							 //[NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
     NSURL *url = [NSURL fileURLWithPath: [applicationSupportDirectory stringByAppendingPathComponent: @"GenieDatabase"]];
     persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: mom];
-	
-	
-    if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType 
+
+    if (!persistentStoreCoordinator || ![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType 
                                                 configuration:nil 
                                                 URL:url 
                                                 options:options 
                                                 error:&error]){
 		NSLog(@"Migration error: %@", [error description]);
 		NSLog(@"Migration userInfo: %@", [[error userInfo] description]);
-		if ([error code] == 134140) {
-			NSAlert *alert = [NSAlert alertWithMessageText:@"Could not read application database"
-											 defaultButton:@"Quit"
-										   alternateButton:@"Continue without database"
-											   otherButton:nil
-								 informativeTextWithFormat:@"Genie can't read your local database at \n~/Library/Application Support/Genie/GenieDatabase\nprobably because it was created by a newer version of the application. Either delete the database if you want to run this specific version of the application or try a never version. If you choose to continue without a database, Genie can't save your setup upon exit."];
-			NSInteger result = [alert runModal];
-			switch (result) {
-				case NSAlertDefaultReturn:
-					// quit
+		
+		[[NSApplication sharedApplication] presentError:error];
+		
+		NSAlert *alert = [NSAlert alertWithMessageText:@"Could not read application database"
+										 defaultButton:@"Quit"
+									   alternateButton:@"Continue without database"
+										   otherButton:nil
+							 informativeTextWithFormat:
+						  @"Genie can't read your local database at \n~/Library/Application Support/Genie/GenieDatabase\n"
+						  "probably because it was created by a newer version of the application. "
+						  "Either delete the database if you want to run this specific version of the application or try a newer version. "
+						  "If you choose to continue without a database, Genie can't save your setup upon exit."];
+		NSInteger result = [alert runModal];
+		switch (result) {
+			case NSAlertDefaultReturn:
+				// quit
+				if (persistentStoreCoordinator) {
 					[persistentStoreCoordinator release], persistentStoreCoordinator = nil;
-					return nil;
-					break;
-				case NSAlertAlternateReturn:
-					// just use the memory store
-					break;
-			}
-		} else {
-			[[NSApplication sharedApplication] presentError:error];
+				}
+				return nil;
+				break;
+			case NSAlertAlternateReturn:
+				// just use the memory store
+				break;
 		}
-        //[persistentStoreCoordinator release], persistentStoreCoordinator = nil;
-        //return nil;
     }
 	[persistentStoreCoordinator addPersistentStoreWithType:NSInMemoryStoreType configuration:nil URL:nil options:nil error:nil];
 

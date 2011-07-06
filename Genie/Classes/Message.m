@@ -23,7 +23,7 @@
 
 @implementation Message 
 
-@dynamic date;
-@dynamic text;
+@synthesize date;
+@synthesize text;
 
 @end

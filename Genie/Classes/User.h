@@ -23,14 +23,16 @@
 @class ChatMessage;
 @class ClanInfo;
 @class FriendInfo;
+@class Server;
+@class Channel;
 
-@interface User :  NSManagedObject  
+@interface User :  NSObject  
 {
 }
 
 @property (nonatomic, retain) NSString * name;
-@property (nonatomic, retain) NSManagedObject * server;
-@property (nonatomic, retain) NSManagedObject * channel;
+@property (nonatomic, retain) Server * server;
+@property (nonatomic, retain) Channel * channel;
 @property (nonatomic, retain) NSSet* messages;
 @property (nonatomic, retain) ClanInfo * clanInfo;
 @property (nonatomic, retain) FriendInfo * friendInfo;

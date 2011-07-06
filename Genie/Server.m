@@ -32,7 +32,8 @@
 			return usr;
 		}
 	}
-	usr = [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:[self managedObjectContext]];
+	//usr = [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:[self managedObjectContext]];
+	usr = [User new];
 	usr.name = nick;
 	usr.server = self;
 	[self addUsersObject:usr];
@@ -41,7 +42,8 @@
 
 - (ChatMessage*)channelMessage:(NSString*)message fromUser:(NSString*)user
 {
-	ChatMessage *msgObj = [NSEntityDescription insertNewObjectForEntityForName:@"ChatMessage" inManagedObjectContext:self.managedObjectContext];
+	ChatMessage *msgObj = [ChatMessage new];
+	//ChatMessage *msgObj = [NSEntityDescription insertNewObjectForEntityForName:@"ChatMessage" inManagedObjectContext:self.managedObjectContext];
 	msgObj.date = [NSDate date];
 	msgObj.channel = self.channel;
 	msgObj.text = message;
@@ -49,6 +51,7 @@
 	//[usrObj addMessagesObject:msgObj];
 	[self.channel addMessagesObject:msgObj];
 	[self addMessagesObject:msgObj];
+	return msgObj;
 }
 
 @end
